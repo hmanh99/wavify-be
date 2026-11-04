@@ -164,10 +164,7 @@ public class AuthService {
     // Login and return pair of accessToken and refreshToken
     @Transactional
     public AuthResponse login(AuthRequest request) {
-        User user = userRepository.findByEmail(request.getEmail());
-        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
-        }
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
         String accessToken = generateAccessToken(user);
         String refreshToken = generateRefreshToken(user);
