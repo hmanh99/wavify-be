@@ -19,6 +19,15 @@ public class GlobalExceptionHandler {
 
     private static final String MIN_ATTRIBUTE = "min";
 
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse> handleMaxUploadSizeExceededException(org.springframework.web.multipart.MaxUploadSizeExceededException exception) {
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(HttpStatus.PAYLOAD_TOO_LARGE.value())
+                .message("Kích thước tệp vượt quá giới hạn tối đa cho phép (Tối đa 50MB)")
+                .build();
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(apiResponse);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception) {
         ApiResponse body = new ApiResponse(

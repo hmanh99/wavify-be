@@ -50,9 +50,6 @@ public class UserService {
         return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
     }
 
-
-    @Mapping(target = "password", ignore = true)
-    @Mapping(target = "roles", ignore = true)
     @PreAuthorize("hasRole('ADMIN') or #userId.toString() == authentication.token.claims['userId']")
     public UserResponse updateUser(UUID userId, UserUpdateRequest request){
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));

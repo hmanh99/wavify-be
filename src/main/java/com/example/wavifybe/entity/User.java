@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -36,13 +37,8 @@ public class User {
     @Column(nullable = false, length = 20)
     UserRole role;
 
-    @Column(nullable = false)
-    Instant created_at;
 
-    @PrePersist
-    protected void onCreate() {
-        if (created_at == null) {
-            created_at = Instant.now();
-        }
-    }
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    Instant createdAt;
 }

@@ -59,9 +59,9 @@ public class UserController {
                 .build();
     }
     @DeleteMapping("/{userId}")
-    public ApiResponse<UserResponse> updateUser(@PathVariable UUID userId){
+    public ApiResponse<Void> updateUser(@PathVariable UUID userId){
         userService.deleteUser(userId);
-        return ApiResponse.<UserResponse>builder()
+        return ApiResponse.<Void>builder()
                 .code(200)
                 .message("Delete user successful")
                 .build();
