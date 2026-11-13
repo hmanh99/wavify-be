@@ -56,20 +56,31 @@ public class PlaylistSongService {
 
         validatePlaylistPermission(playlist);
 
-        int currentMaxPosition = playlistSongRepository.findMaxPosition(playlistId);
         Set<UUID> uniqueSongIds = new LinkedHashSet<>(request.getSongIds());
-        List<PlaylistSong> newPlaylistSongs = new ArrayList<>();
+        if (uniqueSongIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Set<UUID> existingSongIds = playlistSongRepository.findSongIdsByPlaylistIdAndSongIdIn(playlistId, uniqueSongIds);
+        if (!existingSongIds.isEmpty()) {
+            throw new AppException(ErrorCode.SONG_ALREADY_IN_PLAYLIST);
+        }
+
+        List<Song> songs = songRepository.findByIdIn(uniqueSongIds);
+        Map<UUID, Song> songMap = songs.stream()
+                .collect(Collectors.toMap(Song::getId, Function.identity()));
+
+        int currentMaxPosition = playlistSongRepository.findMaxPosition(playlistId);
+        List<PlaylistSong> newPlaylistSongs = new ArrayList<>(uniqueSongIds.size());
 
         for (UUID songId : uniqueSongIds) {
-            Song song = songRepository.findById(songId)
-                    .orElseThrow(() -> new AppException(ErrorCode.SONG_NOT_EXISTED));
+            Song song = songMap.get(songId);
+            if (song == null) {
+                throw new AppException(ErrorCode.SONG_NOT_EXISTED);
+            }
 
             if (song.getVisibility() == Visibility.PRIVATE) {
                 validateSongPermission(song);
-            }
-
-            if (playlistSongRepository.findByIdPlaylistIdAndIdSongId(playlistId, songId).isPresent()) {
-                throw new AppException(ErrorCode.SONG_ALREADY_IN_PLAYLIST);
             }
 
             PlaylistSong playlistSong = new PlaylistSong();

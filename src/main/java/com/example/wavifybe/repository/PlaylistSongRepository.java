@@ -2,16 +2,16 @@ package com.example.wavifybe.repository;
 
 import com.example.wavifybe.entity.PlaylistSong;
 import com.example.wavifybe.entity.PlaylistSongId;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public interface PlaylistSongRepository extends JpaRepository<PlaylistSong, PlaylistSongId> {
@@ -20,14 +20,30 @@ public interface PlaylistSongRepository extends JpaRepository<PlaylistSong, Play
 
     Optional<PlaylistSong> findByIdPlaylistIdAndIdSongId(UUID playlistId, UUID songId);
 
+    /// find existed songs in playlist
+    @Query("""
+            SELECT ps.id.songId FROM PlaylistSong ps 
+            WHERE ps.id.playlistId = :playlistId AND ps.id.songId IN :songIds
+            """)
+    Set<UUID> findSongIdsByPlaylistIdAndSongIdIn(
+            @Param("playlistId") UUID playlistId,
+            @Param("songIds") Collection<UUID> songIds
+    );
+
     // find max position in playlist for add song
-    @Query("SELECT COALESCE(MAX(ps.position), 0) FROM PlaylistSong ps WHERE ps.id.playlistId = :playlistId")
+    @Query("""
+            SELECT COALESCE(MAX(ps.position), 0) FROM PlaylistSong ps 
+            WHERE ps.id.playlistId = :playlistId
+            """)
     int findMaxPosition(@Param("playlistId") UUID playlistId);
 
     // delete playlist_song
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("DELETE FROM PlaylistSong ps WHERE ps.id.playlistId = :playlistId AND ps.id.songId = :songId")
-    int deleteByIdPlaylistIdAndIdSongId(@Param("playlistId") UUID playlistId, @Param("songId") UUID songId);
+    @Query("""
+            DELETE FROM PlaylistSong ps 
+            WHERE ps.id.playlistId = :playlistId AND ps.id.songId = :songId
+            """)
+    void deleteByIdPlaylistIdAndIdSongId(@Param("playlistId") UUID playlistId, @Param("songId") UUID songId);
 
 
     // decrease playlist_song position
