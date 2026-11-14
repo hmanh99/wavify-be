@@ -4,9 +4,8 @@ import com.example.wavifybe.dto.request.RegisterRequest;
 import com.example.wavifybe.dto.request.UserUpdateRequest;
 import com.example.wavifybe.dto.response.UserResponse;
 import com.example.wavifybe.entity.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
+import org.springframework.context.annotation.Bean;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -15,5 +14,6 @@ public interface UserMapper {
     UserResponse toUserResponse(User user);
 
     @Mapping(target = "role", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateUser(@MappingTarget User user, UserUpdateRequest request);
 }

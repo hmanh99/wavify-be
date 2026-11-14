@@ -1,6 +1,11 @@
 spring:
   application:
     name: wavify-be
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
   datasource:
     url: "jdbc:postgresql://localhost:5432/wavify"
     driverClassname: org.postgresql.Driver
@@ -15,6 +20,8 @@ server:
   port: 8080
   servlet:
     context-path: /api/v1
+  tomcat:
+    max-swallow-size: 50MB
 
 jwt:
   token:
@@ -22,3 +29,8 @@ jwt:
     expire-length: 900 # 15 minutes in sec
   refresh-token:
     expire-length: 604800 # 7 days in sec
+
+cloudinary:
+  cloud-name: acyqluvs
+  api-key: 896886164423131
+  api-secret: 18Zc2AA-VV5Ky3-Pyb3kYg7nYTM

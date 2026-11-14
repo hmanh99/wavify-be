@@ -50,11 +50,23 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/songs/my-songs").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/songs", "/songs/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/playlists/my-playlists").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/playlists", "/playlists/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
                 // OAuth2 Resource Server config verify JWT
                 .oauth2ResourceServer(oauth2 -> oauth2
+                        .bearerTokenResolver(request -> {
+                            String path = request.getServletPath();
+                            if (path != null && path.startsWith("/auth/")) {
+                                return null;
+                            }
+                            return new org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver()
+                                    .resolve(request);
+                        })
                         .jwt(jwt -> jwt
                                 .decoder(jwtDecoder())
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
