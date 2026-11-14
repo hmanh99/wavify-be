@@ -54,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/songs", "/songs/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/playlists/my-playlists").authenticated()
                         .requestMatchers(HttpMethod.GET, "/playlists", "/playlists/**").permitAll()
+                        .requestMatchers("/history", "/history/**").authenticated()
                         .anyRequest().authenticated()
                 )
 

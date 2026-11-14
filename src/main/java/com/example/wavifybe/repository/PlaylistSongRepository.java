@@ -22,7 +22,7 @@ public interface PlaylistSongRepository extends JpaRepository<PlaylistSong, Play
 
     /// find existed songs in playlist
     @Query("""
-            SELECT ps.id.songId FROM PlaylistSong ps 
+            SELECT ps.id.songId FROM PlaylistSong ps
             WHERE ps.id.playlistId = :playlistId AND ps.id.songId IN :songIds
             """)
     Set<UUID> findSongIdsByPlaylistIdAndSongIdIn(
@@ -32,7 +32,7 @@ public interface PlaylistSongRepository extends JpaRepository<PlaylistSong, Play
 
     // find max position in playlist for add song
     @Query("""
-            SELECT COALESCE(MAX(ps.position), 0) FROM PlaylistSong ps 
+            SELECT COALESCE(MAX(ps.position), 0) FROM PlaylistSong ps
             WHERE ps.id.playlistId = :playlistId
             """)
     int findMaxPosition(@Param("playlistId") UUID playlistId);
@@ -40,7 +40,7 @@ public interface PlaylistSongRepository extends JpaRepository<PlaylistSong, Play
     // delete playlist_song
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
-            DELETE FROM PlaylistSong ps 
+            DELETE FROM PlaylistSong ps
             WHERE ps.id.playlistId = :playlistId AND ps.id.songId = :songId
             """)
     void deleteByIdPlaylistIdAndIdSongId(@Param("playlistId") UUID playlistId, @Param("songId") UUID songId);

@@ -5,6 +5,8 @@ import com.example.wavifybe.dto.request.SongUpdateRequest;
 import com.example.wavifybe.dto.response.ApiResponse;
 import com.example.wavifybe.dto.response.SongResponse;
 import com.example.wavifybe.service.SongService;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,8 +29,8 @@ public class SongController {
 
     @GetMapping
     public ApiResponse<Page<SongResponse>> getSongs(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "20") @Min(1) @Max(50)int size
     ) {
         var response = songService.getSongs(page, size);
         return ApiResponse.<Page<SongResponse>>builder()
