@@ -37,7 +37,7 @@ public class Song {
     String fileUrl;
 
     /// cloudinary url of cover photo
-    @Column(name = "cover_url", nullable = false)
+    @Column(name = "cover_url")
     String coverUrl;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

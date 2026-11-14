@@ -31,6 +31,6 @@ jwt:
     expire-length: 604800 # 7 days in sec
 
 cloudinary:
-  cloud-name: acyqluvs
-  api-key: 896886164423131
-  api-secret: 18Zc2AA-VV5Ky3-Pyb3kYg7nYTM
+  cloud-name: # your cloudinary cloud name
+  api-key: # cloudinary api key
+  api-secret: # cloudinary secret key
