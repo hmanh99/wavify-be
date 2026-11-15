@@ -1,0 +1,10 @@
+target/
+.git/
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+HELP.md
+README.md
+src/main/resources/application-production.yaml
