@@ -29,7 +29,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./src/main/resources/application-production.yaml:/config/application-production.yaml:ro
+      - ./src/main/resources/application-production.yaml:/config/application-production.yaml:ro # customize your profile
     depends_on:
       db:
         condition: service_healthy
