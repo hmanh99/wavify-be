@@ -12,6 +12,7 @@ import com.example.wavifybe.entity.Visibility;
 import com.example.wavifybe.exception.AppException;
 import com.example.wavifybe.exception.ErrorCode;
 import com.example.wavifybe.mapper.SongMapper;
+import com.example.wavifybe.repository.FavoriteSongRepository;
 import com.example.wavifybe.repository.SongRepository;
 import com.example.wavifybe.repository.UserRepository;
 import lombok.AccessLevel;
@@ -42,6 +43,7 @@ public class SongService {
     SongMapper songMapper;
     SongRepository songRepository;
     UserRepository userRepository;
+    FavoriteSongRepository favoriteSongRepository;
     Cloudinary cloudinary;
 
     @Transactional(readOnly = true)
@@ -189,6 +191,7 @@ public class SongService {
         deleteFromCloudinary(song.getFileUrl(), "video");
         deleteFromCloudinary(song.getCoverUrl(), "image");
 
+        favoriteSongRepository.deleteAllByIdSongId(songId);
         songRepository.delete(song);
     }
 

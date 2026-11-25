@@ -11,6 +11,7 @@ import com.example.wavifybe.entity.Visibility;
 import com.example.wavifybe.exception.AppException;
 import com.example.wavifybe.exception.ErrorCode;
 import com.example.wavifybe.mapper.PlaylistMapper;
+import com.example.wavifybe.repository.FavoritePlaylistRepository;
 import com.example.wavifybe.repository.PlaylistRepository;
 import com.example.wavifybe.repository.UserRepository;
 import lombok.AccessLevel;
@@ -37,6 +38,7 @@ import java.util.UUID;
 public class PlaylistService {
     PlaylistRepository playlistRepository;
     UserRepository userRepository;
+    FavoritePlaylistRepository favoritePlaylistRepository;
     PlaylistMapper playlistMapper;
 
     @Transactional
@@ -124,6 +126,7 @@ public class PlaylistService {
 
         validatePermission(playlist);
 
+        favoritePlaylistRepository.deleteAllByIdPlaylistId(playlistId);
         playlistRepository.delete(playlist);
     }
 
