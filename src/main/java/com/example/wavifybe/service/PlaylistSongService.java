@@ -14,7 +14,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -43,8 +42,9 @@ public class PlaylistSongService {
             validatePlaylistPermission(playlist);
         }
 
+        ViewerContext viewer = ViewerContext.fromSecurityContext();
         return playlistSongRepository.findByIdPlaylistIdOrderByPositionAsc(playlistId).stream()
-                .filter(ps -> canViewSong(ps.getSong()))
+                .filter(ps -> viewer.canView(ps.getSong()))
                 .map(playlistMapper::toPlaylistSongResponse)
                 .toList();
     }
@@ -176,25 +176,6 @@ public class PlaylistSongService {
         if (!isAdmin && !song.getUploader().getEmail().equals(email)) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
-    }
-
-    private boolean canViewSong(Song song) {
-        if (song.getVisibility() == Visibility.PUBLIC) {
-            return true;
-        }
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null
-                || !authentication.isAuthenticated()
-                || authentication instanceof AnonymousAuthenticationToken) {
-            return false;
-        }
-
-        String email = authentication.getName();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-
-        return isAdmin || song.getUploader().getEmail().equals(email);
     }
 }
 

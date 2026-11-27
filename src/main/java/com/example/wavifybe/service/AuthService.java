@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -51,6 +52,7 @@ public class AuthService {
     PasswordEncoder passwordEncoder;
     UserMapper userMapper;
     RefreshTokenRepository refreshTokenRepository;
+    TransactionTemplate transactionTemplate;
 
     @NonFinal
     @Value("${jwt.token.signer-key:${jwt.signerKey:}}")
@@ -63,8 +65,6 @@ public class AuthService {
     @NonFinal
     @Value("${jwt.refresh-token.expire-length:604800}")
     protected long REFRESHABLE_DURATION;
-
-
 
     public String generateAccessToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
@@ -93,7 +93,6 @@ public class AuthService {
         }
     }
 
-
     @Transactional
     public String generateRefreshToken(User user) {
         String rawToken = UUID.randomUUID().toString();
@@ -108,7 +107,6 @@ public class AuthService {
         refreshTokenRepository.save(refreshToken);
         return rawToken;
     }
-
 
     public RefreshToken verifyRefreshToken(String rawRefreshToken) {
         if (rawRefreshToken == null || rawRefreshToken.isBlank()) {
@@ -133,7 +131,6 @@ public class AuthService {
 
         return refreshToken;
     }
-
 
     // Hash token using SHA-256
 
@@ -162,12 +159,16 @@ public class AuthService {
     }
 
     // Login and return pair of accessToken and refreshToken
-    @Transactional
     public AuthResponse login(AuthRequest request) {
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
 
         String accessToken = generateAccessToken(user);
-        String refreshToken = generateRefreshToken(user);
+        String refreshToken = transactionTemplate.execute(tx -> generateRefreshToken(user));
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
@@ -199,7 +200,7 @@ public class AuthService {
                 .build();
     }
 
-    //logout and revoked refreshToken
+    // logout and revoked refreshToken
     @Transactional
     public void logout(RefreshRequest request) {
         try {

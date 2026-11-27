@@ -34,3 +34,7 @@ cloudinary:
   cloud-name: # your cloudinary cloud name
   api-key: # cloudinary api key
   api-secret: # cloudinary secret key
+
+security:
+  bcrypt:
+    strength: 10

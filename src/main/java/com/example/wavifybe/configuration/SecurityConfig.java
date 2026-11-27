@@ -42,6 +42,9 @@ public class SecurityConfig {
     @Value("${jwt.token.signer-key}")
     private String signerKey;
 
+    @Value("${security.bcrypt.strength:10}")
+    private int bcryptStrength;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
@@ -56,8 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/playlists", "/playlists/**").permitAll()
                         .requestMatchers("/history", "/history/**").authenticated()
                         .requestMatchers("/favorites", "/favorites/**").authenticated()
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
 
                 // OAuth2 Resource Server config verify JWT
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -71,9 +73,7 @@ public class SecurityConfig {
                         })
                         .jwt(jwt -> jwt
                                 .decoder(jwtDecoder())
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                        )
-                );
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
         return httpSecurity.build();
     }
@@ -115,6 +115,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12);
+        return new BCryptPasswordEncoder(bcryptStrength);
     }
 }

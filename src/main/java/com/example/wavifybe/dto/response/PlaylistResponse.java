@@ -1,6 +1,7 @@
 package com.example.wavifybe.dto.response;
 
 import com.example.wavifybe.entity.Visibility;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -19,5 +20,6 @@ public class PlaylistResponse {
     String name;
     Visibility visibility;
     Instant createdAt;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     List<SongResponse> songs;
 }
