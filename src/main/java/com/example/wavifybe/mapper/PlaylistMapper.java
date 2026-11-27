@@ -10,7 +10,7 @@ import com.example.wavifybe.entity.PlaylistSong;
 import com.example.wavifybe.entity.Visibility;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {SongMapper.class})
+@Mapper(componentModel = "spring", uses = {SongMapper.class, UserMapper.class})
 public interface PlaylistMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -18,7 +18,7 @@ public interface PlaylistMapper {
     @Mapping(target = "songs", ignore = true)
     Playlist toPlaylist(PlaylistCreationRequest request);
 
-    @Mapping(target = "songs", source = "songs")
+    @Mapping(target = "songs", ignore = true)
     PlaylistResponse toPlaylistResponse(Playlist playlist);
 
     @Mapping(target = ".", source = "song")
